@@ -3,24 +3,21 @@ from typing import Dict
 
 def analyze_task(user_input: str) -> Dict[str, str]:
     """
-    Analyze the user input and classify the task.
-
-    Parameters:
-        user_input (str): Input provided by the user.
-
-    Returns:
-        dict: A dictionary containing task type and original query.
+    Classifies the user task correctly.
+    Priority: tool > planning > general
     """
 
     text = user_input.lower().strip()
 
-    # Identify task type
-    if any(keyword in text for keyword in ["plan", "schedule", "roadmap"]):
-        task_type = "planning"
-
-    elif any(keyword in text for keyword in ["calculate", "add", "subtract", "multiply", "divide"]):
+    # Highest priority: tool
+    if "calculate" in text:
         task_type = "tool"
 
+    # Planning tasks
+    elif any(word in text for word in ["plan", "study plan", "schedule", "roadmap"]):
+        task_type = "planning"
+
+    # Fallback: general
     else:
         task_type = "general"
 
@@ -28,3 +25,4 @@ def analyze_task(user_input: str) -> Dict[str, str]:
         "task_type": task_type,
         "query": user_input
     }
+

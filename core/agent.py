@@ -3,6 +3,7 @@ from core.planner import create_plan
 from core.reasoning import generate_reasoning
 from memory.memory import Memory
 from tools.calculator import calculate
+import re
 
 
 class Agent:
@@ -23,15 +24,24 @@ class Agent:
         task_type = analysis["task_type"]
 
         # -------------------------------------------------
-        # TOOL EXECUTION (Task 1)
+        # TOOL EXECUTION (Task 1: Calculate)
         # -------------------------------------------------
         if task_type == "tool":
-            lower_input = user_input.lower()
+            # Extract expression safely using regex
+            match = re.search(r'calculate\s*(.*)', user_input, re.IGNORECASE)
 
-            # Extract expression safely after 'calculate'
-            expression = lower_input.split("calculate", 1)[1].strip()
+            if not match:
+                return (
+                    "AI Agent Execution\n"
+                    "------------------\n"
+                    "Task Type : tool\n"
+                    "Calculation Result : Invalid calculation"
+                )
 
+            expression = match.group(1).strip()
             result = calculate(expression)
+
+            # Store result in memory
             self.memory.add(f"Tool Result: {result}")
 
             return (
@@ -59,6 +69,11 @@ class Agent:
                 f"{index}. {step}\n"
                 f"   Reason: {reason}\n"
             )
+
+        # Store completion in memory
+        self.memory.add("Agent Response Generated")
+
+        return response
 
         # Store completion in memory
         self.memory.add("Agent Response Generated")
